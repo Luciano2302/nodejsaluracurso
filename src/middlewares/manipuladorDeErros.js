@@ -13,7 +13,7 @@ function manipaluadorErrors(error, req, res, next) {
   }else if(error instanceof NaoEncontrado){
     error.enviarResposta(res);
   }else{
-    new ErrorBase().enviarResposta(res);
+    new ErrorBase(error).enviarResposta(res);
   }
 }
 
