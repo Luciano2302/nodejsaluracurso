@@ -6,12 +6,9 @@ class LivroController {
 
   static async listarLivros(req, res, next){
     try {
-      const listarLivros = await livro.find({});
-      if(listarLivros !== null) {
-        res.status(200).json(listarLivros);
-      }else{
-        next(new NaoEncontrado("Sem livros cadastrados na base de dados."));
-      }
+      const buscaLivros  =  livro.find();
+      req.resultado = buscaLivros;
+      next();
     }catch (error) {
       next(error);
     }
@@ -19,7 +16,7 @@ class LivroController {
 
   static async listarLivroPorId(req, res, next){
     try {
-      const id = req.params.id;  
+      const id = req.params.id; 
       const livroEncontrado = await livro.findById(id);
       if(livroEncontrado !== null) {
         res.status(200).json({message : "Livro encontrado com sucesso", livro : livroEncontrado});
@@ -72,11 +69,21 @@ class LivroController {
     }
   }
 
-  static async listarLivrosPorEditora(req, res, next){
-    const editora = req.query.editora;
+  static async listarLivrosPorFiltro(req, res, next){
     try {
-      const livrosPorEditora = await livro.find({editora: editora});
-      res.status(200).json(livrosPorEditora);
+      const {editora, titulo} = req.query;
+      const busca = {};
+      
+      if(editora){
+        busca.editora = editora;
+      }
+      if(titulo){
+        busca.titulo = { $regex: titulo, $options: "i" };
+      }
+      console.log(busca);
+      const livrosPorEditora =  livro.find({busca});
+      req.resultado  = livrosPorEditora;
+      next();
     }catch (error) {
       next(error);
     }
